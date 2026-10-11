@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark Theme Default Tokens */
+    --color-bg-base: #0B1017;
+    --color-bg-surface: #111A24;
+    --color-bg-elevated: #172230;
+    --color-bg-hover: #1E2D3D;
+    --color-bg-subtle: #0E151F;
+
+    --color-border-subtle: #1E2C3D;
+    --color-border-medium: #2A3C52;
+    --color-border-focus: #6CA9FF;
+
+    --color-text-primary: #F3F6FB;
+    --color-text-secondary: #8E9CAE;
+    --color-text-muted: #5D6B7C;
+    --color-text-inverse: #0B1017;
+
+    --color-accent-primary: #42DDA2;
+    --color-accent-primary-hover: #32C890;
+    --color-accent-primary-subtle: rgba(66, 221, 162, 0.12);
+
+    --color-accent-secondary: #6CA9FF;
+    --color-accent-secondary-hover: #5094F3;
+    --color-accent-secondary-subtle: rgba(108, 169, 255, 0.12);
+
+    --color-trade-profit: #34D399;
+    --color-trade-profit-subtle: rgba(52, 211, 153, 0.14);
+    --color-trade-loss: #F87171;
+    --color-trade-loss-subtle: rgba(248, 113, 113, 0.14);
+    --color-warning: #FBBF24;
+    --color-warning-subtle: rgba(251, 191, 36, 0.14);
+
+    color-scheme: dark;
+  }
+
+  .light,
+  [data-theme='light'] {
+    /* Light Theme Tokens */
+    --color-bg-base: #F5F7FA;
+    --color-bg-surface: #FFFFFF;
+    --color-bg-elevated: #EDF1F7;
+    --color-bg-hover: #E2E8F0;
+    --color-bg-subtle: #F1F4F9;
+
+    --color-border-subtle: #D8E0EB;
+    --color-border-medium: #C2CEDF;
+    --color-border-focus: #3B82F6;
+
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #475569;
+    --color-text-muted: #64748B;
+    --color-text-inverse: #FFFFFF;
+
+    --color-accent-primary: #10B981;
+    --color-accent-primary-hover: #059669;
+    --color-accent-primary-subtle: rgba(16, 185, 129, 0.12);
+
+    --color-accent-secondary: #2563EB;
+    --color-accent-secondary-hover: #1D4ED8;
+    --color-accent-secondary-subtle: rgba(37, 99, 235, 0.12);
+
+    --color-trade-profit: #059669;
+    --color-trade-profit-subtle: rgba(5, 150, 105, 0.14);
+    --color-trade-loss: #DC2626;
+    --color-trade-loss-subtle: rgba(220, 38, 38, 0.14);
+    --color-warning: #D97706;
+    --color-warning-subtle: rgba(217, 119, 6, 0.14);
+
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-bg-base);
+    color: var(--color-text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* Compact scrollbars for financial data panels */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-base);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-medium);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+}
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hide scrollbar while preserving functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
