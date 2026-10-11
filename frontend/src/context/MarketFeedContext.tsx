@@ -59,7 +59,10 @@ export const MarketFeedProvider: React.FC<{ children: React.ReactNode }> = ({
             }));
             setLastHeartbeat(new Date());
           }
-        } catch {}
+        } catch (error) {
+          // Transient polling failure: log debug info and continue loop
+          console.debug(`[MarketFeed] Polling quote update failed for ${sym}:`, error);
+        }
       }
     }, 5000);
   }, []);

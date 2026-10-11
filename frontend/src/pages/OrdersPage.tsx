@@ -40,8 +40,10 @@ export const OrdersPage: React.FC = () => {
       } else {
         setError(res.error?.message || 'Failed to fetch orders');
       }
-    } catch (err: any) {
-      setError(err?.message || 'Error fetching orders from server');
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : 'Error fetching orders from server'
+      );
     } finally {
       setLoading(false);
     }
@@ -66,8 +68,10 @@ export const OrdersPage: React.FC = () => {
       } else {
         toast.error(res.error?.message || 'Unable to cancel order.', 'Cancellation Failed');
       }
-    } catch (err: any) {
-      toast.error(err?.message || 'Network error while cancelling order.');
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : 'Network error while cancelling order.'
+      );
     } finally {
       setCancellingId(null);
     }
@@ -163,7 +167,7 @@ export const OrdersPage: React.FC = () => {
             </TableHeader>
             <TableBody>
               {filteredOrders.map((order) => {
-                const orderId = order.id || (order as any)._id || 'ORD-0';
+                const orderId = order.id || order._id || 'ORD-0';
                 const effectivePricePaise =
                   order.status === 'FILLED'
                     ? order.avgExecutionPricePaise

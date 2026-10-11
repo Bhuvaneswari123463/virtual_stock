@@ -69,8 +69,8 @@ export const WatchlistProvider: React.FC<{ children: React.ReactNode }> = ({
           setActiveWatchlistId(defaultList.id);
         }
       }
-    } catch (err: any) {
-      console.warn('Failed to load watchlists:', err);
+    } catch (err: unknown) {
+      console.warn('Failed to load watchlists:', err instanceof Error ? err.message : err);
     } finally {
       setLoading(false);
     }
@@ -169,8 +169,10 @@ export const WatchlistProvider: React.FC<{ children: React.ReactNode }> = ({
           toast.error(res.error?.message || `Failed to add ${upper} to watchlist.`);
           return false;
         }
-      } catch (err: any) {
-        toast.error(err.message || `Failed to add ${upper}.`);
+      } catch (err: unknown) {
+        toast.error(
+          err instanceof Error ? err.message : `Failed to add ${upper}.`
+        );
         return false;
       }
     },
@@ -203,8 +205,10 @@ export const WatchlistProvider: React.FC<{ children: React.ReactNode }> = ({
           toast.error(res.error?.message || `Failed to remove ${upper}.`);
           return false;
         }
-      } catch (err: any) {
-        toast.error(err.message || `Failed to remove ${upper}.`);
+      } catch (err: unknown) {
+        toast.error(
+          err instanceof Error ? err.message : `Failed to remove ${upper}.`
+        );
         return false;
       }
     },
@@ -261,8 +265,10 @@ export const WatchlistProvider: React.FC<{ children: React.ReactNode }> = ({
           toast.error(res.error?.message || 'Failed to create watchlist.');
           return false;
         }
-      } catch (err: any) {
-        toast.error(err.message || 'Error creating watchlist.');
+      } catch (err: unknown) {
+        toast.error(
+          err instanceof Error ? err.message : 'Error creating watchlist.'
+        );
         return false;
       }
     },

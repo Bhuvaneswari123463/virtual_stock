@@ -86,7 +86,7 @@ export class MarketService {
     const quotes = await this.getQuotesWithCache(candidateSymbols);
 
     // Apply filtering
-    let filtered = quotes.filter((q) => {
+    const filtered = quotes.filter((q) => {
       if (exchange && q.exchange !== exchange) return false;
       if (sector && q.sector.toLowerCase() !== sector.toLowerCase()) return false;
       if (minPricePaise !== undefined && q.ltpPaise < minPricePaise) return false;

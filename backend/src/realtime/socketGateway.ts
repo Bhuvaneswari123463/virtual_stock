@@ -3,7 +3,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
 import { logger } from '../utilities/logger';
-import { marketService } from '../services/marketService';
+import { marketService, MarketQuoteFormatted } from '../services/marketService';
 
 let ioInstance: SocketIOServer | null = null;
 let broadcastIntervalId: NodeJS.Timeout | null = null;
@@ -101,7 +101,9 @@ export function initSocketGateway(httpServer: http.Server): SocketIOServer {
         try {
           const detail = await marketService.getStockDetail(symbol);
           socket.emit('quote:update', detail.quote);
-        } catch {}
+        } catch (error) {
+          logger.debug(`Failed to fetch initial quote for ${symbol}: ${error instanceof Error ? error.message : String(error)}`);
+        }
       }
     });
 
@@ -128,7 +130,7 @@ export function getSocketGateway(): SocketIOServer | null {
   return ioInstance;
 }
 
-export function broadcastQuoteUpdate(symbol: string, quote: any): void {
+export function broadcastQuoteUpdate(symbol: string, quote: MarketQuoteFormatted): void {
   if (ioInstance) {
     const room = `symbol:${symbol.toUpperCase()}`;
     ioInstance.to(room).emit('quote:update', quote);
@@ -150,7 +152,9 @@ function startTickerBroadcaster(io: SocketIOServer): void {
 
         // Broadcast to clients in this symbol's room
         io.to(room).emit('quote:update', detail.quote);
-      } catch {}
+      } catch (error) {
+        logger.debug(`Failed to broadcast quote for ${symbol}: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
   }, 2500);
 

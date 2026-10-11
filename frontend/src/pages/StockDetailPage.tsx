@@ -67,8 +67,10 @@ export const StockDetailPage: React.FC = () => {
       } else {
         setError(res.error?.message || `Stock '${upperSymbol}' could not be found.`);
       }
-    } catch (err: any) {
-      setError(err?.message || 'Error connecting to market service.');
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : 'Error connecting to market service.'
+      );
     } finally {
       setLoading(false);
     }
@@ -95,14 +97,22 @@ export const StockDetailPage: React.FC = () => {
 
       const res = await marketService.getCandles(upperSymbol, resolution);
       if (res.success && res.data && res.data.length > 0) {
-        const formatted: CandlestickData[] = res.data.map((c: BackendCandle) => ({
-          time: c.timestamp as any,
-          open: c.openPaise / 100,
-          high: c.highPaise / 100,
-          low: c.lowPaise / 100,
-          close: c.closePaise / 100,
-          volume: c.volume,
-        }));
+        const formatted: CandlestickData[] = res.data.map((c: BackendCandle) => {
+          const dateStr =
+            typeof c.timestamp === 'number'
+              ? new Date(c.timestamp > 1e11 ? c.timestamp : c.timestamp * 1000)
+                  .toISOString()
+                  .split('T')[0]
+              : String(c.timestamp);
+          return {
+            time: dateStr,
+            open: c.openPaise / 100,
+            high: c.highPaise / 100,
+            low: c.lowPaise / 100,
+            close: c.closePaise / 100,
+            volume: c.volume,
+          };
+        });
         setCandles(formatted);
       } else {
         // Fallback generator if remote candles empty

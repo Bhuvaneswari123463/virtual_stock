@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app';
 import { MarketService } from '../src/services/marketService';
@@ -6,7 +6,6 @@ import { MockMarketDataProvider } from '../src/services/market/mockProvider';
 import { IMarketDataProvider } from '../src/services/market/provider.interface';
 import {
   ProviderTimeoutError,
-  ProviderRateLimitError,
   ProviderMalformedResponseError,
   withRetry,
 } from '../src/services/market/retry';

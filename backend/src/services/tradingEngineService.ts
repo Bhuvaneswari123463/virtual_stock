@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { Portfolio, IPortfolio } from '../models/Portfolio';
-import { Holding } from '../models/Holding';
+import { Holding, IHolding } from '../models/Holding';
 import { Order, IOrder, OrderSide, OrderType, OrderStatus } from '../models/Order';
 import { TradeExecution, ITradeExecution } from '../models/TradeExecution';
 import { CashLedger } from '../models/CashLedger';
@@ -12,8 +12,8 @@ import { BadRequestError, NotFoundError, ForbiddenError } from '../utilities/err
 import { logger } from '../utilities/logger';
 
 export interface OrderExecutionResult {
-  order: IOrder | any;
-  execution?: ITradeExecution | any;
+  order: IOrder | InMemoryOrder;
+  execution?: ITradeExecution | InMemoryExecution;
   cashBeforePaise: number;
   cashAfterPaise: number;
   message: string;
@@ -261,7 +261,7 @@ export class TradingEngineService {
     const dataSource = quote.dataSource || 'MOCK_SIMULATED';
 
     const portfolio = await this.getOrCreatePortfolio(userId);
-    const portfolioId = (portfolio as any)._id?.toString() || (portfolio as any).id;
+    const portfolioId = '_id' in portfolio ? String(portfolio._id) : portfolio.id;
     const cashBeforePaise = portfolio.cashBalancePaise;
 
     // 3. Handle BUY Order
@@ -536,7 +536,9 @@ export class TradingEngineService {
     // Update order status to CANCELLED
     if (dbManager.isConnected()) {
       order.status = 'CANCELLED';
-      await (order as any).save();
+      if ('save' in order && typeof order.save === 'function') {
+        await order.save();
+      }
       return order;
     }
 
@@ -553,7 +555,7 @@ export class TradingEngineService {
     const skip = (page - 1) * limit;
 
     if (dbManager.isConnected()) {
-      const filter: any = { userId: new Types.ObjectId(userId) };
+      const filter: Record<string, unknown> = { userId: new Types.ObjectId(userId) };
       if (status !== 'ALL') {
         if (status === 'FILLED' || status === 'EXECUTED') {
           filter.status = { $in: ['FILLED', 'EXECUTED'] };
@@ -633,7 +635,7 @@ export class TradingEngineService {
     holdings: HoldingEnriched[];
   }> {
     const portfolio = await this.getOrCreatePortfolio(userId);
-    const portfolioId = (portfolio as any)._id?.toString() || (portfolio as any).id;
+    const portfolioId = '_id' in portfolio ? String(portfolio._id) : portfolio.id;
 
     const rawHoldings = await this.findUserHoldings(userId);
     const holdingsEnriched: HoldingEnriched[] = [];
@@ -648,7 +650,10 @@ export class TradingEngineService {
       try {
         const detail = await marketService.getStockDetail(h.symbol);
         ltpPaise = detail.quote.ltpPaise;
-      } catch {}
+      } catch (error) {
+        // Fallback to average purchase price if current quote is temporarily unavailable
+        logger.debug(`Using fallback acquisition price for ${h.symbol}: ${error instanceof Error ? error.message : String(error)}`);
+      }
 
       const holdingCurrentValuePaise = ltpPaise * h.quantity;
       const holdingInvestedPaise = h.totalInvestedPaise;
@@ -969,7 +974,7 @@ export class TradingEngineService {
     cashBeforePaise: number;
     cashAfterPaise: number;
     limitPricePaise?: number;
-    holding: any;
+    holding: IHolding | InMemoryHolding;
     dataSource: string;
     quoteTimestamp: Date;
     idempotencyKey?: string;
@@ -1049,7 +1054,9 @@ export class TradingEngineService {
       } else {
         holding.totalInvestedPaise = holding.quantity * holding.avgBuyPricePaise;
       }
-      await holding.save();
+      if ('save' in holding && typeof holding.save === 'function') {
+        await holding.save();
+      }
 
       // 5. Record Cash Ledger Credit
       await CashLedger.create({
@@ -1281,7 +1288,7 @@ export class TradingEngineService {
     productType: 'CNC' | 'MIS';
     quantity: number;
     limitPricePaise: number;
-    holding: any;
+    holding: IHolding | InMemoryHolding;
     dataSource: string;
     quoteTimestamp: Date;
     idempotencyKey?: string;
@@ -1303,7 +1310,9 @@ export class TradingEngineService {
     if (dbManager.isConnected()) {
       // 1. Lock shares on Holding
       holding.lockedQuantity += quantity;
-      await holding.save();
+      if ('save' in holding && typeof holding.save === 'function') {
+        await holding.save();
+      }
 
       // 2. Create Order in OPEN status
       const order = await Order.create({

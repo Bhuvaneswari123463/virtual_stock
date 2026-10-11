@@ -193,8 +193,9 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
         toast.error(errorMsg, 'Order Rejected');
         setShowConfirmModal(false);
       }
-    } catch (err: any) {
-      const errorMsg = err?.message || 'Network error while placing order.';
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error ? err.message : 'Network error while placing order.';
       setValidationError(errorMsg);
       toast.error(errorMsg, 'Order Placement Failed');
       setShowConfirmModal(false);

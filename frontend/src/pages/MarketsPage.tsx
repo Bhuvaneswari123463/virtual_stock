@@ -66,8 +66,8 @@ export const MarketsPage: React.FC = () => {
       if (res.success && res.data) {
         setOverview(res.data);
       }
-    } catch (err: any) {
-      console.warn('Market overview error:', err);
+    } catch (err: unknown) {
+      console.warn('Market overview error:', err instanceof Error ? err.message : err);
     }
   }, []);
 
@@ -106,8 +106,12 @@ export const MarketsPage: React.FC = () => {
         }
         setError(res.error?.message || 'Failed to load market data.');
       }
-    } catch (err: any) {
-      setError(err?.message || 'Network error while contacting market service.');
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Network error while contacting market service.'
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);

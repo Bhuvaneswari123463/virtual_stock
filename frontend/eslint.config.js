@@ -21,7 +21,16 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true, allowExportNames: ['useTheme', 'useToast'] },
+        {
+          allowConstantExport: true,
+          allowExportNames: [
+            'useTheme',
+            'useToast',
+            'useAuth',
+            'useMarketFeed',
+            'useWatchlist',
+          ],
+        },
       ],
       '@typescript-eslint/no-unused-vars': [
         'warn',

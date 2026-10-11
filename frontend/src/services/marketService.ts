@@ -178,14 +178,22 @@ class BackendMarketService {
     try {
       const res = await this.getCandles(symbol, timeframe);
       if (res.success && res.data && res.data.length > 0) {
-        return res.data.map((c) => ({
-          time: c.timestamp as any,
-          open: c.openPaise / 100,
-          high: c.highPaise / 100,
-          low: c.lowPaise / 100,
-          close: c.closePaise / 100,
-          volume: c.volume,
-        }));
+        return res.data.map((c) => {
+          const dateStr =
+            typeof c.timestamp === 'number'
+              ? new Date(c.timestamp > 1e11 ? c.timestamp : c.timestamp * 1000)
+                  .toISOString()
+                  .split('T')[0]
+              : String(c.timestamp);
+          return {
+            time: dateStr,
+            open: c.openPaise / 100,
+            high: c.highPaise / 100,
+            low: c.lowPaise / 100,
+            close: c.closePaise / 100,
+            volume: c.volume,
+          };
+        });
       }
     } catch {
       // fallback
@@ -198,12 +206,20 @@ class BackendMarketService {
     let price = basePriceRupees;
     for (let i = 50; i >= 0; i--) {
       const time = now - i * 86400;
+      const dateStr = new Date(time * 1000).toISOString().split('T')[0];
       const change = (Math.random() - 0.48) * (price * 0.02);
       const open = price;
       const close = price + change;
       const high = Math.max(open, close) + Math.random() * (price * 0.01);
       const low = Math.min(open, close) - Math.random() * (price * 0.01);
-      candles.push({ time: time as any, open, high, low, close, volume: Math.round(50000 + Math.random() * 200000) });
+      candles.push({
+        time: dateStr,
+        open,
+        high,
+        low,
+        close,
+        volume: Math.round(50000 + Math.random() * 200000),
+      });
       price = close;
     }
     return candles;

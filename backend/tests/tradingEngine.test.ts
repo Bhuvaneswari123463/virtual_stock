@@ -1,10 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app';
 import jwt from 'jsonwebtoken';
 import { config } from '../src/config';
 import { STARTING_VIRTUAL_CAPITAL_PAISE } from '../src/utilities/money';
-import { tradingEngineService } from '../src/services/tradingEngineService';
 
 describe('Phase 7 Server-Authoritative Virtual Trading Engine Tests', () => {
   const app = createApp();

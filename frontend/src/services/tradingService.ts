@@ -125,6 +125,23 @@ export interface CashLedgerItem {
   createdAt: string;
 }
 
+export interface TradeExecutionItem {
+  id: string;
+  _id?: string;
+  orderId: string;
+  userId?: string;
+  symbol: string;
+  exchange?: 'NSE' | 'BSE';
+  side: 'BUY' | 'SELL';
+  quantity: number;
+  executionPricePaise: number;
+  totalValuePaise: number;
+  feesPaise: number;
+  dataSource?: string;
+  quoteTimestamp?: string;
+  executedAt: string;
+}
+
 class TradingService {
   async placeOrder(payload: PlaceOrderPayload): Promise<ApiResponse<PlacedOrderResult>> {
     // Generate UUID idempotency key if not provided
@@ -157,8 +174,8 @@ class TradingService {
     return await apiRequest<OrderItem[]>(`/orders${qs ? `?${qs}` : ''}`);
   }
 
-  async getOrderById(orderId: string): Promise<ApiResponse<{ order: OrderItem; executions: any[] }>> {
-    return await apiRequest<{ order: OrderItem; executions: any[] }>(`/orders/${orderId}`);
+  async getOrderById(orderId: string): Promise<ApiResponse<{ order: OrderItem; executions: TradeExecutionItem[] }>> {
+    return await apiRequest<{ order: OrderItem; executions: TradeExecutionItem[] }>(`/orders/${orderId}`);
   }
 
   async cancelOrder(orderId: string): Promise<ApiResponse<{ order: OrderItem; refundPaise: number; unlockedShares: number; message: string }>> {
@@ -176,8 +193,8 @@ class TradingService {
     return await apiRequest<CashLedgerItem[]>('/portfolio/ledger');
   }
 
-  async getExecutions(): Promise<ApiResponse<any[]>> {
-    return await apiRequest<any[]>('/portfolio/executions');
+  async getExecutions(): Promise<ApiResponse<TradeExecutionItem[]>> {
+    return await apiRequest<TradeExecutionItem[]>('/portfolio/executions');
   }
 }
 

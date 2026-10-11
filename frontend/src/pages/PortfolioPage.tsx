@@ -285,7 +285,7 @@ export const PortfolioPage: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {ledger.map((entry) => {
-                  const id = entry.id || (entry as any)._id || Math.random().toString();
+                  const id = entry.id || entry._id || String(entry.createdAt);
                   const isCredit = entry.entryType === 'CREDIT';
                   const dateStr = new Date(entry.createdAt).toLocaleString('en-IN', {
                     month: 'short',

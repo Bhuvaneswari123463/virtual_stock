@@ -170,9 +170,13 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         return;
       }
 
-      const candleData = param.seriesData.get(candleSeries) as any;
-      if (candleData) {
-        const volData = volumeSeries ? (param.seriesData.get(volumeSeries) as any) : undefined;
+      const candleData = param.seriesData.get(candleSeries) as
+        | { open: number; high: number; low: number; close: number }
+        | undefined;
+      if (candleData && typeof candleData.open === 'number') {
+        const volData = volumeSeries
+          ? (param.seriesData.get(volumeSeries) as { value: number } | undefined)
+          : undefined;
         setLegend({
           open: candleData.open,
           high: candleData.high,

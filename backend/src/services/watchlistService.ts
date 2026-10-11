@@ -55,7 +55,7 @@ export class WatchlistService {
 
   async getWatchlists(userId: string): Promise<WatchlistEnriched[]> {
     if (dbManager.isConnected()) {
-      let lists = await Watchlist.find({ userId: new Types.ObjectId(userId) }).sort({ createdAt: 1 });
+      const lists = await Watchlist.find({ userId: new Types.ObjectId(userId) }).sort({ createdAt: 1 });
 
       // If user has no default watchlist, auto-initialize default watchlist
       if (!lists.some((l) => l.isDefault)) {
@@ -77,7 +77,7 @@ export class WatchlistService {
     }
 
     // In-memory fallback
-    let userLists = this.inMemoryStore.get(userId) || [];
+    const userLists = this.inMemoryStore.get(userId) || [];
     if (!userLists.some((l) => l.isDefault)) {
       const defaultId = new Types.ObjectId().toHexString();
       const defaultList: InMemoryWatchlist = {
